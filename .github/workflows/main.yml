@@ -36,6 +36,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest requests pytest-mock selenium requests-mock coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Install geckodriver
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y firefox-geckodriver
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -45,13 +49,14 @@ jobs:
     - name: Startup HTTP Server for pipeline tests
       uses: Eun/http-server-action@v1.0.11
       with:
-        directory: .
+        directory: /home/runner/work/cse270-teton/cse270-teton  # Set your desired root directory here
         port: 5500
         index-files: |
-          ["index.html", "index.htm"]           
+          ["index.html", "index.htm"]
+    - name: Wait for server to start
+      run: sleep 10  # Wait for 10 seconds to ensure the server is up
     - name: Run tests
-      run: |
-        pytest
+      run: pytest
 
   analyze:
     needs: build
